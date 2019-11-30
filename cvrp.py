@@ -56,4 +56,4 @@ class Instance:
                     
                 
             
-Instance("Instances/A\A-n32-k5.vrp")
+# I = Instance("Instances/A\A-n32-k5.vrp")

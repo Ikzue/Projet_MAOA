@@ -57,19 +57,99 @@ def get_road(nodes_with_neighbours,nodes,Q): #retourne le plus court chemin part
 def get_score(roads, G): #Obtient la somme des distances de la solution globale
     score = 0
     for road in roads:
-        score += get_score_road(road,G)
+        score += get_road_score(road,G)
     return score
 
 
-def get_score_road(road,G): #Obtient la distance parcourue dans un chemin
+def get_road_score(road,G): #Obtient la distance parcourue dans un chemin
     score = 0
     for i in range(len(road)-1):
         score += G[road[i]][road[i+1]]['weight']
     return score
 
+def road_to_clients(road):
+    return road[1:-1] if len(road)>1 else []
+
+def clients_to_road(clients, depot = 1):
+    return [depot] + clients + [depot]
+
 I = cvrp.Instance("Instances/A\A-n32-k5.vrp")
 #I = cvrp.Instance("Instances/A\A-n65-k9.vrp") #Opt=9,nombre de camions = 10
 #I = cvrp.Instance("Instances/A\A-n32-k5.vrp")
 roads, score = roads_list(I)
-print("nombre de camions: ",len(roads))
-print("score: ", score)
+
+#print("nombre de camions: ",len(roads))
+#print("score: ", score)
+#print(roads)
+
+
+
+
+"""
+Deuxième étape : échanges entre routes
+Tant que non convergence :
+    On prends la route la plus lourde :
+        On regarde un client au hasard de cette route :
+            Si il peut aller dans la route la plus légère :
+                Il se met à chaque place possible de la route :
+                    Pour chaque place on calcule le poids total de toutes les routes
+                Il se place à la place qui a minimisé le poids total
+"""
+
+
+"""
+Première étape : amélioration indépendante des tournées
+Pour chaque route :
+    Calcul du poids de la route
+    Pour chaque client de la route :
+        Pour chaque autre client de la route :
+            Tentative d'échange entre les deux :
+                Calcul du poids de la route résultant de l'échange
+        Si un échange bat le poids actuel de la route on l'effectue et on actualise le poids
+"""
+def local_amelioration(road, I):
+    best_score = get_road_score(road, I.G)
+    clients = road_to_clients(road)
+    if len(clients) <= 1:
+        return road
+    best_swap = (1,1)
+    for i, client in enumerate(clients):
+        for j, client2 in enumerate(clients):
+            # Creation d'une nouvelle liste de clients
+            new_clients = list(clients)
+
+            # Inversement des positions dans la nouvelle liste
+            new_clients[i], new_clients[j] = new_clients[j], new_clients[i]
+            
+            # Calcul du nouveau score
+            new_score = get_road_score(clients_to_road(new_clients), I.G)
+
+            if new_score < best_score:
+                best_score = new_score
+                best_swap = (i, j)
+
+    i, j = best_swap
+    new_clients = list(clients)
+    new_clients[i], new_clients[j] = new_clients[j], new_clients[i]
+
+    return clients_to_road(new_clients)
+
+
+def chaining_local_ameliration(road, I):
+
+    while True:
+        best_score = get_road_score(road, I.G)
+        new_road = local_amelioration(road, I)
+        new_score = get_road_score(new_road, I.G)
+        if best_score == new_score:
+            break
+        else :
+            road = new_road
+
+    return new_road
+
+def local_ameliorations(roads, I):
+    return [chaining_local_ameliration(road, I) for road in roads]
+
+# test_road = [1, 6, 11, 9, 25, 26, 19, 28, 21, 1]
+print(local_ameliorations(roads, I))
