@@ -8,6 +8,7 @@ Created on Fri Nov 29 14:16:07 2019
 
 import cvrp
 from operator import itemgetter, attrgetter
+import math
 
 #On considere que le depot est egal au sommet 1
 def roads_list(I):
@@ -85,16 +86,7 @@ roads, score = roads_list(I)
 
 
 
-"""
-Deuxième étape : échanges entre routes
-Tant que non convergence :
-    On prends la route la plus lourde :
-        On regarde un client au hasard de cette route :
-            Si il peut aller dans la route la plus légère :
-                Il se met à chaque place possible de la route :
-                    Pour chaque place on calcule le poids total de toutes les routes
-                Il se place à la place qui a minimisé le poids total
-"""
+
 
 
 """
@@ -136,7 +128,7 @@ def local_amelioration(road, I):
 
 
 def chaining_local_ameliration(road, I):
-
+    # On améliore tant que le score s'améliore
     while True:
         best_score = get_road_score(road, I.G)
         new_road = local_amelioration(road, I)
@@ -151,5 +143,58 @@ def chaining_local_ameliration(road, I):
 def local_ameliorations(roads, I):
     return [chaining_local_ameliration(road, I) for road in roads]
 
-# test_road = [1, 6, 11, 9, 25, 26, 19, 28, 21, 1]
-print(local_ameliorations(roads, I))
+"""
+locally_ameliorated_roads = local_ameliorations(roads, I)
+print(get_score(roads, I.G))
+print(get_score(locally_ameliorated_roads, I.G))
+"""
+
+"""
+Deuxième étape : échanges entre routes
+Tant que non convergence :
+    On crée un vecteur de probabilité favorisant le choix d'une route lourde
+    On crée un vecteur de probabilité favorisant le choix d'une route légère
+    On prends une route lourde
+    On regarde un client au hasard de cette route
+    On prends une route légère
+    Si le client choisit peut aller dans la route légère :
+        Il se met à chaque place possible de la route :
+            Pour chaque place on calcule le poids total de toutes les routes
+        Il se place à la place qui a minimisé le poids total
+
+
+Fonctions :
+    - Prends une route et un client et calcule si on peut mettre le client dans la route
+    - Prends une route de départ, une route d'arrivée et un client de la route de départ
+        Essaie de mettre le client de la route de départ à chaque place de la route d'arrivée
+        Place le client au meilleur endroit trouvé
+        Renvoie les deux routes qu'il y ait eu ou non amélioration
+
+
+Recuit simulé :
+    On crée un vecteur de probabilité favorisant le choix d'une route lourde
+    On crée un vecteur de probabilité favorisant le choix d'une route légère
+    On tire une route lourde
+    On tire une route légère
+    On prends chaque client de la route lourde
+"""
+
+def weight_ponderation_vector(roads, I, maximisation = True):
+    """
+    Prends une liste de routes et renvoie un vecteur de probabilité pondérant fortement 
+    les routes lourdes/faibles selon si maximisation = True/False
+    """
+
+    weights = [get_road_score(road, I.G) for road in roads]
+    T = min(weights)
+    exp_weights = [math.exp(w/T) for w in weights]
+    total_exp_weights = sum(exp_weights)
+
+    print(exp_weights)
+    print(total_exp_weights)
+
+    probabilities = [w / total_exp_weights for w in exp_weights]
+    print(probabilities)
+
+weight_ponderation_vector(roads, I)
+
