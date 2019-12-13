@@ -287,13 +287,20 @@ int main (int argc, char**argv){
   for(itp = Lsol.begin(); itp!=Lsol.end();itp++) {
     best_length+=G.lengthTSP(itp->first,itp->second);
     ficsol<<itp->first<<" "<<itp->second<<endl;
+    //cout << itp->first<<" "<<itp->second<<endl;
   }
  
   ficsol.close();
 
   cout<<"Tour found of value : "<<best_length<<endl;
 
-
-
+  list<list<int>> L;
+  G.return_cycles_CVRP(Lsol,L);
+/*
+  for(i = 0; i < G.nb_nodes; i++)
+     for (j=0;j<G.nb_nodes;j++)
+      if (i!=j)
+          cout << i << " " << j << " ";
+          */
   return 0;
 }

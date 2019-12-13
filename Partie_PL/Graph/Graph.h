@@ -129,7 +129,7 @@ public:
 
   /*********************************************/
   /*********** ALGORITHMS **********************/
-
+bool return_cycles_CVRP(list<pair<int,int>>&sol, list<list<int>> &L);
   // Return true if the directed graph induced by node subset sol is acyclic
   // Use a deep-first search algorithm in O(n+m)
   bool detect_circuit(vector<int>&sol);

@@ -566,7 +566,78 @@ void C_Graph::write_SVG_tour(string InstanceName, list<pair<int,int> >& sol){
 
 //////////////////////////////////////////////////
 /////////////////////////////////////////////////
+bool C_Graph::return_cycles_CVRP(list<pair<int,int>>&sol, list<list<int>> &L){
+  vector<bool> sommet_pris;
+  bool neighbour_found;
+  int current_node;
+  int neighbour;
+  list<int> cycle;
+  sommet_pris.resize(nb_nodes);
+  for(int i=0;i<nb_nodes;i++){
+    sommet_pris[i] = false;
+  }
 
+  /*list <C_link*> voisins = V_nodes[0].L_adjLinks;
+     for(it=voisins.begin() ; it !=voisins.end() ; it++){
+     cout<< (**it).v1 << " "<< (**it).v2 << endl;
+  }
+  */
+  list<pair<int,int>>::iterator it;
+  sommet_pris[0] = true;
+  for(it = sol.begin(); it!=sol.end();it++) {
+    //cout << it->first<<" "<<it->second<<endl;
+    neighbour_found = false; 
+    if (it->first == 0){
+      if (!(sommet_pris[it->second])) {
+        neighbour_found = true;
+        neighbour = it->second;
+      }
+    }
+
+    if (it->second == 0){
+      if (!(sommet_pris[it->first])) {
+        neighbour_found = true;
+        neighbour = it->first;
+      }
+    }
+
+    if (neighbour_found) {
+      cycle.clear();
+      cycle.push_back(0);
+      current_node = 0;
+      while (neighbour_found) {
+        neighbour_found = false;
+        list<pair<int,int>>::iterator it2;
+        for(it2 = sol.begin(); it2!=sol.end();it2++) {
+          if (it2->first == current_node){
+            if (!(sommet_pris[it2->second])) {
+              neighbour_found = true;
+              neighbour = it2->second;
+            }
+          }
+
+          if (it2->second == current_node){
+            if (!(sommet_pris[it2->first])) {
+              neighbour_found = true;
+              neighbour = it2->first;
+            }
+          }
+        }
+        if(neighbour_found){
+          cycle.push_back(neighbour);
+          current_node = neighbour;
+          sommet_pris[current_node] = true;
+        }
+      }
+      list<int>::iterator itprint;
+      cout << "Cycle";
+      for(itprint = cycle.begin(); itprint!=cycle.end();itprint++){
+        cout<< *itprint<<endl;
+      }
+    }
+  }
+  return true;
+}
 bool C_Graph::detect_circuit(vector<int>&sol){
   list<C_link*>::const_iterator it;
   int i,cpt,totnode;
