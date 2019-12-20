@@ -129,7 +129,8 @@ public:
 
   /*********************************************/
   /*********** ALGORITHMS **********************/
-bool return_cycles_CVRP(list<pair<int,int>>&sol, list<list<int>> &L);
+  bool is_there_neighbour(int current_node, int first, int second, int* neighbour, vector<bool> sommet_pris);
+  bool return_cycle_CVRP(list<pair<int,int>>&sol, list<pair<int,int>> &L);
   // Return true if the directed graph induced by node subset sol is acyclic
   // Use a deep-first search algorithm in O(n+m)
   bool detect_circuit(vector<int>&sol);

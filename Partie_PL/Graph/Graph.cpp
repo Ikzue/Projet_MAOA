@@ -566,12 +566,38 @@ void C_Graph::write_SVG_tour(string InstanceName, list<pair<int,int> >& sol){
 
 //////////////////////////////////////////////////
 /////////////////////////////////////////////////
-bool C_Graph::return_cycles_CVRP(list<pair<int,int>>&sol, list<list<int>> &L){
-  vector<bool> sommet_pris;
+
+bool C_Graph::is_there_neighbour(int current_node, int first, int second, int* neighbour, vector<bool> sommet_pris) {
+  bool neighbour_found = false; 
+  if (first == current_node){
+    if (!(sommet_pris[second])) {
+      neighbour_found = true;
+      *neighbour = second;
+    }
+  }
+
+  if (second == current_node){
+    if (!(sommet_pris[first])) {
+      neighbour_found = true;
+      *neighbour = first;
+    }
+  }
+
+  return neighbour_found;
+}
+
+
+
+bool C_Graph::return_cycle_CVRP(list<pair<int,int>>&sol, list<pair<int,int>> &L){
+  //cout<< "Entree" << endl;
+  vector<bool> sommet_pris; 
   bool neighbour_found;
   int current_node;
-  int neighbour;
+  int neighbour = -1;
+  int* ptneigh;
+  ptneigh = &neighbour;
   list<int> cycle;
+  int previous_node;
   sommet_pris.resize(nb_nodes);
   for(int i=0;i<nb_nodes;i++){
     sommet_pris[i] = false;
@@ -584,60 +610,112 @@ bool C_Graph::return_cycles_CVRP(list<pair<int,int>>&sol, list<list<int>> &L){
   */
   list<pair<int,int>>::iterator it;
   sommet_pris[0] = true;
-  for(it = sol.begin(); it!=sol.end();it++) {
+  for(it = sol.begin(); it!=sol.end();it++) { //On trouve le premier voisin de 0 et on le met dans neighbour
     //cout << it->first<<" "<<it->second<<endl;
-    neighbour_found = false; 
-    if (it->first == 0){
-      if (!(sommet_pris[it->second])) {
-        neighbour_found = true;
-        neighbour = it->second;
-      }
-    }
-
-    if (it->second == 0){
-      if (!(sommet_pris[it->first])) {
-        neighbour_found = true;
-        neighbour = it->first;
-      }
-    }
-
-    if (neighbour_found) {
+    neighbour_found = is_there_neighbour(0, it->first, it->second, ptneigh, sommet_pris);
+    if (neighbour_found) { //Tous les cycles partant de zero
       cycle.clear();
       cycle.push_back(0);
       current_node = 0;
       while (neighbour_found) {
         neighbour_found = false;
         list<pair<int,int>>::iterator it2;
-        for(it2 = sol.begin(); it2!=sol.end();it2++) {
-          if (it2->first == current_node){
-            if (!(sommet_pris[it2->second])) {
-              neighbour_found = true;
-              neighbour = it2->second;
-            }
-          }
-
-          if (it2->second == current_node){
-            if (!(sommet_pris[it2->first])) {
-              neighbour_found = true;
-              neighbour = it2->first;
-            }
+        for(it2 = sol.begin(); it2!=sol.end();it2++) { //On trouve le prochain voisin du sommet dans le cycle
+          if(is_there_neighbour(current_node, it2->first, it2->second, ptneigh, sommet_pris)) {
+            neighbour_found = true;
           }
         }
-        if(neighbour_found){
+        if(neighbour_found){ //Ajout dans le cycle du voisin
           cycle.push_back(neighbour);
           current_node = neighbour;
           sommet_pris[current_node] = true;
         }
       }
+      int demande = 0;
       list<int>::iterator itprint;
-      cout << "Cycle";
-      for(itprint = cycle.begin(); itprint!=cycle.end();itprint++){
-        cout<< *itprint<<endl;
+      for(itprint = cycle.begin(); itprint!=cycle.end();itprint++)
+        demande += V_nodes[*itprint].weight;
+      previous_node = -1;
+      if(demande > truck_capacity){
+        for(itprint = cycle.begin(); itprint!=cycle.end();itprint++){
+          if(previous_node == -1){
+            previous_node = *itprint;
+          }
+          else{
+            L.push_back(make_pair(previous_node, *itprint));
+            previous_node = *itprint;
+          }
+        }
+        L.push_back(make_pair(previous_node, *cycle.begin()));
+        list<pair<int,int>>::iterator Lprint;
+        /*
+        cout << "Cycle";
+        for(Lprint = L.begin(); Lprint!=L.end();Lprint++){
+          cout << Lprint->first << " " << Lprint->second << endl; 
+        }
+        */
+        return true;
       }
     }
   }
-  return true;
+
+  //TODO: Cycle partant pas de zero
+  for(int i=0;i<nb_nodes;i++){
+    neighbour_found = false;
+    if(!sommet_pris[i]) { //Le sommet de depart du cycle, sommet non deja pris
+      sommet_pris[i] = true;
+      for(it = sol.begin(); it!=sol.end();it++) { //On trouve le premier voisin de i et on le met dans neighbour
+        neighbour_found = is_there_neighbour(i, it->first, it->second, ptneigh, sommet_pris);
+        if (neighbour_found) { //On a trouve un voisin
+          cycle.clear();
+          cycle.push_back(i);
+          current_node = i;
+          while (neighbour_found) {
+            neighbour_found = false;
+            list<pair<int,int>>::iterator it2;
+            for(it2 = sol.begin(); it2!=sol.end();it2++) { //On trouve le prochain voisin du sommet dans le cycle
+              if(is_there_neighbour(current_node, it2->first, it2->second, ptneigh, sommet_pris)) {
+                neighbour_found = true;
+              }
+            }
+            if(neighbour_found){ //Ajout dans le cycle du voisin
+              cycle.push_back(neighbour);
+              current_node = neighbour;
+              sommet_pris[current_node] = true;
+            }
+          }
+          previous_node = -1;
+          list<int>::iterator itprint;
+          for(itprint = cycle.begin(); itprint!=cycle.end();itprint++){
+            if(previous_node == -1){
+              previous_node = *itprint;
+            }
+            else{
+              L.push_back(make_pair(previous_node, *itprint));
+              previous_node = *itprint;
+            }
+          }
+          L.push_back(make_pair(previous_node, *cycle.begin()));
+          list<pair<int,int>>::iterator Lprint;
+          /*
+          cout << "Cycle partant pas de 0";
+          for(Lprint = L.begin(); Lprint!=L.end();Lprint++){
+            cout << Lprint->first << " " << Lprint->second << endl; 
+          }
+          */
+          return true;
+          
+
+        }
+      }
+    }
+  }
+  
+    
+  return false;
 }
+
+
 bool C_Graph::detect_circuit(vector<int>&sol){
   list<C_link*>::const_iterator it;
   int i,cpt,totnode;

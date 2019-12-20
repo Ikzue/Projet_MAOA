@@ -59,7 +59,7 @@ CCFLAGS = $(CCOPT) -I$(CPLEXINCDIR) -I$(CONCERTINCDIR) -I$(LEMONINCDIR)
 
 
 
-all: CompactMIP_TSP
+all: CompactMIP_TSP CompactMIP_TSP_CUT
 
 Graph.o: ../../Graph/Graph.cpp ../../Graph/Graph.h
 	$(CCC) -c $(CCFLAGS) $(CCLNDIRS) -c ../../Graph/Graph.cpp -o ../../Graph/Graph.o
@@ -67,8 +67,15 @@ Graph.o: ../../Graph/Graph.cpp ../../Graph/Graph.h
 CompactMIP_TSP.o: CompactMIP_TSP.cpp
 	$(CCC) -c $(CCFLAGS) $(CCLNDIRS) CompactMIP_TSP.cpp
 
+CompactMIP_TSP_CUT.o: CompactMIP_TSP_CUT.cpp
+	$(CCC) -c $(CCFLAGS) $(CCLNDIRS) CompactMIP_TSP_CUT.cpp
+
 CompactMIP_TSP: CompactMIP_TSP.o  Graph.o 
 	$(CCC) $(CCFLAGS) $(CCLNDIRS) CompactMIP_TSP.o ../../Graph/Graph.o   -o ../../bin/CompactMIP_TSP $(CCLNFLAGS)
 
+CompactMIP_TSP_CUT: CompactMIP_TSP_CUT.o  Graph.o 
+	$(CCC) $(CCFLAGS) $(CCLNDIRS) CompactMIP_TSP_CUT.o ../../Graph/Graph.o   -o ../../bin/CompactMIP_TSP_CUT $(CCLNFLAGS)
+
 clean:
 	rm -f *.o ../../bin/CompactMIP_TSP
+	rm -f *.o ../../bin/CompactMIP_TSP_CUT
