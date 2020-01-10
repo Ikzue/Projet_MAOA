@@ -1,5 +1,5 @@
 NAME : A-n32-k5
-COMMENT : (Augerat et al, No of trucks: 2, Optimal value: 784)
+COMMENT : (Augerat et al, No of trucks: 4, Optimal value: 784)
 TYPE : CVRP
 DIMENSION : 5
 EDGE_WEIGHT_TYPE : EUC_2D 
@@ -12,7 +12,7 @@ NODE_COORD_SECTION
  5 31 31
 DEMAND_SECTION 
 1 0 
-2 19 
+2 20 
 3 21 
 4 6 
 5 19 
