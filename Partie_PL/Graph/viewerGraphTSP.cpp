@@ -41,19 +41,16 @@ int main(int argc,char**argv){
   list<pair<int,int>> L;
   list<pair<int,int>> sol;
   sol.clear();
-  /*
-  sol.push_back(make_pair(0,2));
-  sol.push_back(make_pair(0,3));
+
+  sol.push_back(make_pair(0,20));
+  sol.push_back(make_pair(20,27));
+  sol.push_back(make_pair(27,23));
+  sol.push_back(make_pair(23,3));
+  sol.push_back(make_pair(3,2));
+  sol.push_back(make_pair(2,13));
+  sol.push_back(make_pair(13,7));
+  sol.push_back(make_pair(7,1));
   sol.push_back(make_pair(1,0));
-  sol.push_back(make_pair(2,1));
-  sol.push_back(make_pair(3,4));
-  sol.push_back(make_pair(4,0));
-  G.return_cycle_CVRP(sol,L);
- */
-  sol.push_back(make_pair(1,11));
-  sol.push_back(make_pair(11,6));
-  sol.push_back(make_pair(6,14));
-  sol.push_back(make_pair(14,1));
   G.return_cycle_CVRP(sol,L);
   
   

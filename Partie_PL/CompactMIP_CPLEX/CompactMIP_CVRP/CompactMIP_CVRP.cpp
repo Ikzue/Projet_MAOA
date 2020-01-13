@@ -118,6 +118,8 @@ int main (int argc, char**argv){
   nomcst.str("");
   nomcst<<"CstDepDegOut_"<<0;
   CC[nbcst].setName(nomcst.str().c_str());
+  cout << CC[nbcst];
+  cout << "\n";
   nbcst++;
 
   //   sum_{i=1 to n} x_i0 <= m
@@ -126,10 +128,11 @@ int main (int argc, char**argv){
 	  c2+=x[i][0];
   }
   CC.add(c2<=G.nb_max_trucks);
-  cout<<"\n";
   nomcst.str("");
   nomcst<<"CstDepDegIn_"<<0;
   CC[nbcst].setName(nomcst.str().c_str());
+  cout << CC[nbcst];
+  cout << "\n";
   nbcst++;
  
   //   sum_{j=1 to n, j!=i} x_ij = 1   for all node i=1 to n
@@ -142,6 +145,8 @@ int main (int argc, char**argv){
     nomcst.str("");
     nomcst<<"CstDegOut_"<<i;
     CC[nbcst].setName(nomcst.str().c_str());
+    cout << CC[nbcst];
+    cout << "\n";
     nbcst++;
   }
   
@@ -155,9 +160,10 @@ int main (int argc, char**argv){
     nomcst.str("");
     nomcst<<"CstDegInt_"<<j;
     CC[nbcst].setName(nomcst.str().c_str());
+    cout << CC[nbcst];
+    cout << "\n";
     nbcst++;
   }
-  
   
 
   // u_i -u_j + 1 <= n (1 -x_ij) for all i=2 to n and j = 2 to n j!= i
@@ -182,6 +188,48 @@ int main (int argc, char**argv){
     }
   }
 
+  /* MTZ VERSION 2 ===========================
+  for (i=1;i<G.nb_nodes;i++){
+    for (j=1;j<G.nb_nodes;j++){
+      if (i!=j){
+
+
+        int d_i = G.V_nodes[i].weight;
+        int d_j = G.V_nodes[j].weight;
+        if (d_i+d_j <= G.truck_capacity) {
+          IloExpr c5(env);
+          c5 = u[j] - u[i] - G.truck_capacity * x[i][j];
+          CC.add(c5 >= d_j - G.truck_capacity);
+          nomcst.str("");
+          nomcst<<"CstMTZ_"<<i<<"_"<<j;
+          CC[nbcst].setName(nomcst.str().c_str());
+          cout << CC[nbcst];
+          cout << "\n";
+          nbcst++;
+        }
+        
+      }
+    }
+  }
+
+  for (i=1; i<G.nb_nodes; i++)
+  {
+    IloExpr c7(env);
+    int d_i = G.V_nodes[i].weight;
+    c7 = u[i];
+    CC.add(c7 <= G.truck_capacity - d_i);
+    nomcst.str("");
+    nomcst<<"CstMTZ_"<<i;
+    CC[nbcst].setName(nomcst.str().c_str());
+    cout << CC[nbcst];
+    cout << "\n";
+    nbcst++;
+  }
+
+
+
+  // =================================== MTZ VERSION 2*/
+
   for (i=0;i<G.nb_nodes;i++){
     for (j=0;j<G.nb_nodes;j++){
       if (i!=j){
@@ -191,6 +239,8 @@ int main (int argc, char**argv){
       nomcst.str("");
       nomcst<<"CstOpposites_"<<i<<"_"<<j;
       CC[nbcst].setName(nomcst.str().c_str());
+      cout << CC[nbcst];
+      cout << "\n";
       nbcst++;
       }
     }
@@ -255,11 +305,19 @@ int main (int argc, char**argv){
 
 
   list<pair<int,int> >   Lsol;
+  for(i = 1; i < G.nb_nodes; i++){
+    cout << "u " << i << " ";
+    cout << cplex.getValue(u[i]);
+    cout << endl;
+  }
+
   for(i = 0; i < G.nb_nodes; i++)
      for (j=0;j<G.nb_nodes;j++)
       if (i!=j)
-	if (cplex.getValue(x[i][j])>1-epsilon)
+	if (cplex.getValue(x[i][j])>1-epsilon){
+    cout << "x" << i  << j << " " << cplex.getValue(x[i][j])<<endl;
 	  Lsol.push_back(make_pair(i,j));
+  }
   
 
   //////////////
@@ -286,6 +344,5 @@ int main (int argc, char**argv){
   ficsol.close();
 
   cout<<"Tour found of value : "<<best_length<<endl;
-
   return 0;
 }
