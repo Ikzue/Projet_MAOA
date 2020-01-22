@@ -344,5 +344,10 @@ int main (int argc, char**argv){
   ficsol.close();
 
   cout<<"Tour found of value : "<<best_length<<endl;
+  cout << "Q: " << G.truck_capacity << endl;
+  cout << " Max trucks:" << G.nb_max_trucks << endl;
+  cout << "NB nodes: " << G.nb_nodes << endl;
+  cout << " Demande 0 :" << G.V_nodes[0].weight << endl;
+  cout << " Demande 1 :" << G.V_nodes[1].weight << endl;
   return 0;
 }

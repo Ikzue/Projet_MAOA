@@ -710,8 +710,7 @@ bool C_Graph::return_cycle_CVRP(list<pair<int,int>>&sol, list<pair<int,int>> &L)
       }
     }
   }
-  
-    
+
   return false;
 }
 
