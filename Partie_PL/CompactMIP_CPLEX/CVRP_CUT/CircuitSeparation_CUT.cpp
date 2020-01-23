@@ -38,7 +38,7 @@ void  find_ViolatedCycle_INTEGER(IloEnv env, C_Graph & G,  vector<vector<IloNumV
                 break;
                 }
             }
-            if(is_in_cycle){
+            if(is_in_cycle && i!=0){
             W.push_back(i);
             }
             else{
@@ -68,26 +68,24 @@ void  find_ViolatedCycle_INTEGER(IloEnv env, C_Graph & G,  vector<vector<IloNumV
             }
         }
         Q = G.truck_capacity;
+        /*
         cout << "demande ";
         cout << demande << endl;
         cout << "Q ";
         cout << Q << endl;
         cout << "sup(demande/Q) ";
         cout << ceil(float(demande)/Q) << endl;
+        */
         IloRange newCte = IloRange(expr >= ceil(float(demande)/Q));
         L_ViolatedCst.push_back(newCte);
         }
     else{
-        IloExpr expr2(env);
-        for (j=1;j<G.nb_nodes;j++){
-            expr+=x[0][j];
-            expr2+=x[j][0];
+        cout << "=====================" << endl;
+        for (i=1;j<G.nb_nodes;j++){
+            expr+=x[i][0];
         }
         IloRange newCte = IloRange(expr >= 2);
-        cout << expr2 << endl;
-        IloRange newCte2 = IloRange(expr2 >= 2);
         L_ViolatedCst.push_back(newCte);
-        L_ViolatedCst.push_back(newCte2);
     }
     }
 }

@@ -206,8 +206,8 @@ int main (int argc, char**argv){
     nbcst++;
   }
   
-  for (i=0;i<G.nb_nodes;i++){
-    for (j=0;j<G.nb_nodes;j++){
+  for (i=1;i<G.nb_nodes;i++){
+    for (j=1;j<G.nb_nodes;j++){
       if (i!=j){
       IloExpr c6(env);
       c6 = x[i][j] + x[j][i];
