@@ -170,13 +170,13 @@ int main (int argc, char**argv){
   // becomes  n x_ij +ui -uj <= n -1
 
   //w_i - w_j >= di - (Q + di)(1-xij) for all i=1 to n and j=1 to n and i!=j
-  for (i=1;i<G.nb_nodes;i++){
+  for (i=0;i<G.nb_nodes;i++){
     for (j=1;j<G.nb_nodes;j++){
       if (i!=j){
         IloExpr c5(env);
 
-        int d_i = G.V_nodes[i].weight;
-        c5 = u[i] - u[j] - ((G.truck_capacity + d_i) * x[i][j]);
+        int d_j = G.V_nodes[j].weight;
+        c5 = u[j] - u[i] - ((G.truck_capacity + d_j) * x[i][j]);
         CC.add(c5 >= - G.truck_capacity);
         nomcst.str("");
         nomcst<<"CstMTZ_"<<i<<"_"<<j;
@@ -230,8 +230,8 @@ int main (int argc, char**argv){
 
   // =================================== MTZ VERSION 2*/
 
-  for (i=0;i<G.nb_nodes;i++){
-    for (j=0;j<G.nb_nodes;j++){
+  for (i=1;i<G.nb_nodes;i++){
+    for (j=1;j<G.nb_nodes;j++){
       if (i!=j){
       IloExpr c6(env);
       c6 = x[i][j] + x[j][i];
