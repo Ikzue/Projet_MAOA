@@ -22,14 +22,14 @@ void  find_ViolatedCycle_INTEGER(IloEnv env, C_Graph & G,  vector<vector<IloNumV
   }
 
   if (G.return_cycle_CVRP(sol,L)){
-      cout<<"cycle" << endl;
     list<int> W;
     list<int> notW;
     bool is_in_cycle;
     list<pair<int,int> >::const_iterator it;
+    /*
     for (it=L.begin();it!=L.end();it++){
         cout << it->first << " " << it->second << endl;
-    }
+    }*/
     for(i=0;i<G.nb_nodes;i++){
         is_in_cycle = false;
             for (it=L.begin();it!=L.end();it++){
@@ -52,14 +52,14 @@ void  find_ViolatedCycle_INTEGER(IloEnv env, C_Graph & G,  vector<vector<IloNumV
     list<int>::const_iterator itnotW;
     int demande = 0;
     int Q;
-    cout << "W" << endl;
+    //cout << "W" << endl;
     for (itW = W.begin(); itW != W.end(); itW++){
-        cout << *itW << endl;
+        //cout << *itW << endl;
         demande += G.V_nodes[*itW].weight;
     }
-    cout << "notW" << endl;
+    //cout << "notW" << endl;
     for (itnotW = notW.begin(); itnotW != notW.end(); itnotW++){
-        cout << *itnotW << endl;
+        //cout << *itnotW << endl;
     }
     if(!notW.empty()){
         for (itW = W.begin(); itW != W.end(); itW++){
@@ -68,19 +68,11 @@ void  find_ViolatedCycle_INTEGER(IloEnv env, C_Graph & G,  vector<vector<IloNumV
             }
         }
         Q = G.truck_capacity;
-        /*
-        cout << "demande ";
-        cout << demande << endl;
-        cout << "Q ";
-        cout << Q << endl;
-        cout << "sup(demande/Q) ";
-        cout << ceil(float(demande)/Q) << endl;
-        */
         IloRange newCte = IloRange(expr >= ceil(float(demande)/Q));
         L_ViolatedCst.push_back(newCte);
         }
     else{
-        cout << "=====================" << endl;
+        //cout << "=====================" << endl;
         for (i=1;j<G.nb_nodes;j++){
             expr+=x[i][0];
         }
